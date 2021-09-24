@@ -1,2 +1,2 @@
 # Basic-Aim-Trainer
-Free to use simple aim trainer made in unity
+Free to use simple fps aim trainer made in unity
