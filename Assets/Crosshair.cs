@@ -1,11 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class Crosshair : MonoBehaviour
 {
-    [SerializeField] CrosshairData crosshair;
+    public CrosshairData crosshair;
     [SerializeField] GameObject imagePrefab;
     private RectTransform[] images = new RectTransform[10];
     private Vector3[] directions = new Vector3[]{
@@ -16,9 +17,12 @@ public class Crosshair : MonoBehaviour
         Vector3.right,
         Vector3.zero
     };
+    private string filePath;
 
     private void Awake()
     {
+        filePath = Path.Combine(Application.persistentDataPath, "Crosshair.json");
+        Load();
         InstantiateCrosshair();
         SetInitialPositions();
         UpdateCrosshair();
@@ -33,11 +37,36 @@ public class Crosshair : MonoBehaviour
         }
         images = rects.ToArray();
     }
-    private void UpdateCrosshair()
+    public void UpdateCrosshair()
     {
         UpdateRadius();
         UpdateColor();
         UpdateVisibility();
+        Save();
+    }
+
+    private void Load()
+    {
+        if (!File.Exists(filePath))
+        {
+            LoadDefault();
+            return;
+        }
+        var json = File.ReadAllText(filePath);
+        crosshair = JsonUtility.FromJson<CrosshairData>(json);
+    }
+    private void Save()
+    {
+        var json = JsonUtility.ToJson(crosshair, true);
+        File.WriteAllText(filePath, json);
+    }
+
+
+    public void LoadDefault()
+    {
+        crosshair = new CrosshairData(
+            new CrosshairColor(0, 255, 0, 255), new CrosshairColor(0, 0, 0, 255),
+            2f, 5f, 2f, 2f, false, 2, false, 2f);
     }
 
     private void UpdateColor()

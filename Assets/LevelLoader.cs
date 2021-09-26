@@ -7,6 +7,7 @@ public class LevelLoader : MonoBehaviour
 {
     private void Awake()
     {
+        DontDestroyOnLoad(this);
         if (SceneManager.sceneCount == 1)
         {
             StartCoroutine(LoadBoxLevel());

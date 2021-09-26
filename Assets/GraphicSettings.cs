@@ -86,7 +86,7 @@ public class GraphicSettings : MonoBehaviour
         var state = JsonUtility.FromJson<GraphicSettingState>(json);
         for (int i = 0; i < state.value.Length; i++)
         {
-            settings[i].selected = state.value[i];
+            settings[i].SetValue(state.value[i]);
         }
         OnLoad?.Invoke();
     }

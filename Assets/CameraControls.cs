@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -12,7 +13,7 @@ public class CameraControls : MonoBehaviour
     private Controls controls;
     private InputAction aim;
     private InputAction shoot;
-    public float sensitivity = 1;
+    public ControlSettings settings;
     public Vector3 localRotation;
     private Ray ray;
     private bool isShoot;
@@ -20,10 +21,13 @@ public class CameraControls : MonoBehaviour
     public float shootDelay = 0.080f;
     public LayerMask layerMask;
     private RaycastHit hit;
+    private string filePath;
 
     private void Awake()
     {
         controls = new Controls();
+        filePath = Path.Combine(Application.persistentDataPath, "Controls.json");
+        Load();
     }
 
 
@@ -59,7 +63,6 @@ public class CameraControls : MonoBehaviour
     {
         if (canShoot)
         {
-            Debug.Log("shoot");
             ray = camera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
             isShoot = true;
             StartCoroutine(DelayNextShot());
@@ -81,8 +84,8 @@ public class CameraControls : MonoBehaviour
 
     private void MouseMove(InputAction.CallbackContext obj)
     {
-        localRotation.y += obj.ReadValue<Vector2>().x * sensitivity;
-        localRotation.x += obj.ReadValue<Vector2>().y * -sensitivity;
+        localRotation.y += obj.ReadValue<Vector2>().x * settings.sensitivity;
+        localRotation.x += obj.ReadValue<Vector2>().y * -settings.sensitivity;
         localRotation.y %= 360f;
         localRotation.x = Mathf.Clamp(localRotation.x, -90f, 90f);
     }
@@ -94,4 +97,34 @@ public class CameraControls : MonoBehaviour
         shoot.Disable();
         aim.Disable();
     }
+
+
+
+    private void Load()
+    {
+        if (!File.Exists(filePath))
+        {
+            LoadDefault();
+            return;
+        }
+        var json = File.ReadAllText(filePath);
+        settings = JsonUtility.FromJson<ControlSettings>(json);
+    }
+    private void Save()
+    {
+        var json = JsonUtility.ToJson(settings, true);
+        File.WriteAllText(filePath, json);
+    }
+
+    public void LoadDefault()
+    {
+        settings = new ControlSettings(0.25f);
+    }
+
+    public void UpdateSettings(ControlSettings settings)
+    {
+        this.settings = settings;
+        Save();
+    }
+
 }
