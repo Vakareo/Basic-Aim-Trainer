@@ -23,6 +23,8 @@
 .vs/
 .vscode/
 
+/[Aa]ssets/RawInput.Sharp*
+
 # Gradle cache directory
 .gradle/
 
