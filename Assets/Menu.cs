@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Scripting;
 
 public class Menu : MonoBehaviour
 {
@@ -12,6 +13,7 @@ public class Menu : MonoBehaviour
     {
         DontDestroyOnLoad(this);
         DontDestroyOnLoad(eventSystem);
+
     }
     public void SwitchToCrosshair()
     {

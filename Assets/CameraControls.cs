@@ -22,6 +22,7 @@ public class CameraControls : MonoBehaviour
     public LayerMask layerMask;
     private RaycastHit hit;
     private string filePath;
+    private float sensOffset = 0.1f;
 
     private void Awake()
     {
@@ -38,12 +39,13 @@ public class CameraControls : MonoBehaviour
         shoot.Enable();
         aim.Enable();
         shoot.performed += Shoot;
-        aim.performed += MouseMove;
+        //aim.performed += MouseMove;
 
     }
 
     private void Update()
     {
+        MouseMoveDeltaTime();
         transform.localEulerAngles = localRotation;
     }
 
@@ -84,15 +86,22 @@ public class CameraControls : MonoBehaviour
 
     private void MouseMove(InputAction.CallbackContext obj)
     {
-        localRotation.y += obj.ReadValue<Vector2>().x * settings.sensitivity;
-        localRotation.x += obj.ReadValue<Vector2>().y * -settings.sensitivity;
+        localRotation.y += obj.ReadValue<Vector2>().x * settings.sensitivity * sensOffset;
+        localRotation.x += obj.ReadValue<Vector2>().y * -settings.sensitivity * sensOffset;
+        localRotation.y %= 360f;
+        localRotation.x = Mathf.Clamp(localRotation.x, -90f, 90f);
+    }
+    private void MouseMoveDeltaTime()
+    {
+        localRotation.y += aim.ReadValue<Vector2>().x * settings.sensitivity * sensOffset;
+        localRotation.x += aim.ReadValue<Vector2>().y * -settings.sensitivity * sensOffset;
         localRotation.y %= 360f;
         localRotation.x = Mathf.Clamp(localRotation.x, -90f, 90f);
     }
 
     private void OnDisable()
     {
-        aim.performed -= MouseMove;
+        //aim.performed -= MouseMove;
         shoot.performed -= Shoot;
         shoot.Disable();
         aim.Disable();
