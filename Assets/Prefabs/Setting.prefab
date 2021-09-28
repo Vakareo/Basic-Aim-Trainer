@@ -1194,7 +1194,7 @@ GameObject:
   - component: {fileID: 8166339144887001804}
   - component: {fileID: 8166339144887001807}
   m_Layer: 5
-  m_Name: Graphic Setting
+  m_Name: Setting
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

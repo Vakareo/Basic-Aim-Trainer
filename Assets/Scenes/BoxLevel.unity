@@ -222,7 +222,7 @@ GameObject:
   - component: {fileID: 242260109}
   - component: {fileID: 242260110}
   m_Layer: 0
-  m_Name: spawner
+  m_Name: GameSequence
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -255,8 +255,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetPrefab: {fileID: 8758992402285307483, guid: a8bd6c92cf81d9c43852ec6b6e3d58e2, type: 3}
-  maxDistance: 8
+  maxDistance: 5
   minDistance: 1.5
   maxHeight: 4
-  maxDepth: 9
-  time: 1
+  maxDepth: 4
+  time: 2

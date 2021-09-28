@@ -9,6 +9,7 @@ public class Menu : MonoBehaviour
     [SerializeField] GameObject GraphicsMenu;
     [SerializeField] GameObject ControlsMenu;
     [SerializeField] GameObject CrosshairMenu;
+    [SerializeField] GameObject LevelsMenu;
     private void Awake()
     {
         DontDestroyOnLoad(this);
@@ -30,18 +31,25 @@ public class Menu : MonoBehaviour
         DisableAllMenus();
         ControlsMenu.SetActive(true);
     }
+    public void SwitchToLevels()
+    {
+        DisableAllMenus();
+        LevelsMenu.SetActive(true);
+    }
 
     private void DisableAllMenus()
     {
         GraphicsMenu.SetActive(false);
         ControlsMenu.SetActive(false);
         CrosshairMenu.SetActive(false);
+        LevelsMenu.SetActive(false);
     }
     private void EnableAllMenus()
     {
         GraphicsMenu.SetActive(true);
         ControlsMenu.SetActive(true);
         CrosshairMenu.SetActive(true);
+        LevelsMenu.SetActive(true);
     }
 
 }

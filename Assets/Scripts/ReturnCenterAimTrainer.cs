@@ -7,22 +7,23 @@ public class ReturnCenterAimTrainer : MonoBehaviour
 {
     public GameObject targetPrefab;
     private GameObject spawnedTarget;
-
+    private TargetComponent targetComponent;
     public float maxDistance = 20f;
     public float minDistance = 2f;
-
     public float maxHeight = 5f;
     public float maxDepth = 6f;
-
     public float time = 2f;
     private float waitTime;
-
     private Vector3 initialPosition;
     private Vector3 newPosition;
-
     private int spawnCount = 0;
-
     public WeightedSelection outerRanges;
+    private bool isHit;
+    private float totalTime;
+    private int totalCount;
+
+    public static Action<int> OnUpdatedAvg;
+    private int avgKillTime;
 
     private void OnValidate()
     {
@@ -31,6 +32,7 @@ public class ReturnCenterAimTrainer : MonoBehaviour
 
     private void Awake()
     {
+        totalCount = 1;
         initialPosition = transform.position;
         var tempRanges = new WeightedRange[]{
             new WeightedRange(GetOuterPercent(0.7f) , GetOuterPercent(1f), 80),
@@ -44,6 +46,25 @@ public class ReturnCenterAimTrainer : MonoBehaviour
     {
 
         spawnedTarget = Instantiate(targetPrefab, GetRandomCenter(), Quaternion.identity, transform);
+        targetComponent = spawnedTarget.AddComponent<TargetComponent>();
+        targetComponent.OnHit += OnHit;
+        spawnCount = 1;
+    }
+
+    private void OnDestroy()
+    {
+        targetComponent.OnHit -= OnHit;
+    }
+
+    private void OnHit()
+    {
+        isHit = true;
+    }
+
+    private void SetAvgKillTime()
+    {
+        avgKillTime = (int)(totalTime / totalCount * 1000f);
+        OnUpdatedAvg?.Invoke(avgKillTime);
     }
 
     private Vector3 GetRandomCenter()
@@ -77,17 +98,30 @@ public class ReturnCenterAimTrainer : MonoBehaviour
     private void Update()
     {
         waitTime += Time.deltaTime;
+        if (isHit)
+        {
+            ResetObject();
+            isHit = false;
+        }
         if (waitTime >= time)
         {
-            var odd = spawnCount & 1;
-            if (odd == 1)
-            {
-                SetObjectToCenter();
-            }
-            else
-            {
-                SetObjectToOuter();
-            }
+            ResetObject();
+        }
+    }
+
+    private void ResetObject()
+    {
+        var odd = spawnCount & 1;
+        totalTime += waitTime;
+        totalCount = spawnCount;
+        SetAvgKillTime();
+        if (odd == 1)
+        {
+            SetObjectToOuter();
+        }
+        else
+        {
+            SetObjectToCenter();
         }
     }
 
@@ -109,8 +143,4 @@ public class ReturnCenterAimTrainer : MonoBehaviour
     {
         return minDistance + ((maxDistance - minDistance) * percent);
     }
-
-
-
-
 }

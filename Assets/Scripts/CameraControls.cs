@@ -24,6 +24,9 @@ public class CameraControls : MonoBehaviour
     private string filePath;
     private float sensOffset = 0.1f;
 
+    private TargetComponent target;
+    private GameObject targetObject;
+
     private void Awake()
     {
         controls = new Controls();
@@ -39,13 +42,11 @@ public class CameraControls : MonoBehaviour
         shoot.Enable();
         aim.Enable();
         shoot.performed += Shoot;
-        //aim.performed += MouseMove;
-
     }
 
     private void Update()
     {
-        MouseMoveDeltaTime();
+        MoveMouse();
         transform.localEulerAngles = localRotation;
     }
 
@@ -55,10 +56,27 @@ public class CameraControls : MonoBehaviour
         {
             if (Physics.Raycast(ray, out hit, 1000, layerMask))
             {
-
+                if (!target)
+                {
+                    if (hit.transform.gameObject.TryGetComponent<TargetComponent>(out target))
+                    {
+                        targetObject = hit.transform.gameObject;
+                        SendTargetHit();
+                    }
+                }
+                else
+                {
+                    if (hit.transform.gameObject == targetObject)
+                        SendTargetHit();
+                }
             };
             isShoot = false;
         }
+    }
+
+    private void SendTargetHit()
+    {
+        target.Hit();
     }
 
     private void Shoot(InputAction.CallbackContext obj)
@@ -84,14 +102,7 @@ public class CameraControls : MonoBehaviour
         canShoot = true;
     }
 
-    private void MouseMove(InputAction.CallbackContext obj)
-    {
-        localRotation.y += obj.ReadValue<Vector2>().x * settings.sensitivity * sensOffset;
-        localRotation.x += obj.ReadValue<Vector2>().y * -settings.sensitivity * sensOffset;
-        localRotation.y %= 360f;
-        localRotation.x = Mathf.Clamp(localRotation.x, -90f, 90f);
-    }
-    private void MouseMoveDeltaTime()
+    private void MoveMouse()
     {
         localRotation.y += aim.ReadValue<Vector2>().x * settings.sensitivity * sensOffset;
         localRotation.x += aim.ReadValue<Vector2>().y * -settings.sensitivity * sensOffset;
