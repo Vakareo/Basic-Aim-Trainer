@@ -3,57 +3,67 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ReturnCenterAimTrainer : MonoBehaviour
+public class ReturnCenterAimTrainer : MonoBehaviour, IGameMode
 {
     public GameObject targetPrefab;
-    private GameObject spawnedTarget;
+    private GameObject targetSpawned;
     private TargetComponent targetComponent;
+    [Range(1f, 25f)]
     public float maxDistance = 20f;
+    [Range(0f, 5f)]
     public float minDistance = 2f;
+    [Range(0f, 10f)]
     public float maxHeight = 5f;
+    [Range(0f, 10f)]
     public float maxDepth = 6f;
     public float time = 2f;
     private float waitTime;
     private Vector3 initialPosition;
-    private Vector3 newPosition;
-    private int spawnCount = 0;
+    private int spawnedCount = 0;
     public WeightedSelection outerRanges;
     private bool isHit;
     private float totalTime;
-    private int totalCount;
-
     public static Action<int> OnUpdatedAvg;
     private int avgKillTime;
+
+    public bool IsPlaying { get; private set; }
 
     private void OnValidate()
     {
         initialPosition = transform.position;
+        minDistance = Mathf.Min(minDistance, maxDistance);
     }
 
     private void Awake()
     {
-        totalCount = 1;
-        initialPosition = transform.position;
-        var tempRanges = new WeightedRange[]{
-            new WeightedRange(GetOuterPercent(0.7f) , GetOuterPercent(1f), 80),
-            new WeightedRange(GetOuterPercent(0.3f) , GetOuterPercent(0.5f), 15),
-            new WeightedRange(GetOuterPercent(0f) , GetOuterPercent(0.1f), 5)
-        };
-        outerRanges = new WeightedSelection(tempRanges);
         InitializeObject();
     }
     private void InitializeObject()
     {
-
-        spawnedTarget = Instantiate(targetPrefab, GetRandomCenter(), Quaternion.identity, transform);
-        targetComponent = spawnedTarget.AddComponent<TargetComponent>();
-        targetComponent.OnHit += OnHit;
-        spawnCount = 1;
+        targetSpawned = Instantiate(targetPrefab, transform.position, Quaternion.identity, transform);
+        targetComponent = targetSpawned.AddComponent<TargetComponent>();
+        targetSpawned.SetActive(false);
+    }
+    private void Update()
+    {
+        if (IsPlaying)
+        {
+            waitTime += Time.deltaTime;
+            if (isHit)
+            {
+                SetObjectToNextPosition();
+                isHit = false;
+            }
+            if (waitTime >= time)
+            {
+                SetObjectToNextPosition();
+            }
+        }
     }
 
     private void OnDestroy()
     {
-        targetComponent.OnHit -= OnHit;
+        Stop();
     }
 
     private void OnHit()
@@ -61,9 +71,9 @@ public class ReturnCenterAimTrainer : MonoBehaviour
         isHit = true;
     }
 
-    private void SetAvgKillTime()
+    private void UpdateAvgKillTime()
     {
-        avgKillTime = (int)(totalTime / totalCount * 1000f);
+        avgKillTime = (int)(totalTime / spawnedCount * 1000f);
         OnUpdatedAvg?.Invoke(avgKillTime);
     }
 
@@ -95,26 +105,12 @@ public class ReturnCenterAimTrainer : MonoBehaviour
         return value;
     }
 
-    private void Update()
-    {
-        waitTime += Time.deltaTime;
-        if (isHit)
-        {
-            ResetObject();
-            isHit = false;
-        }
-        if (waitTime >= time)
-        {
-            ResetObject();
-        }
-    }
 
-    private void ResetObject()
+    private void SetObjectToNextPosition()
     {
-        var odd = spawnCount & 1;
+        var odd = spawnedCount & 1;
         totalTime += waitTime;
-        totalCount = spawnCount;
-        SetAvgKillTime();
+        UpdateAvgKillTime();
         if (odd == 1)
         {
             SetObjectToOuter();
@@ -123,24 +119,58 @@ public class ReturnCenterAimTrainer : MonoBehaviour
         {
             SetObjectToCenter();
         }
+        spawnedCount++;
+        waitTime = 0;
     }
 
     private void SetObjectToCenter()
     {
-        spawnedTarget.transform.position = GetRandomCenter();
-        spawnCount++;
-        waitTime = 0;
+        targetSpawned.transform.position = GetRandomCenter();
     }
 
     private void SetObjectToOuter()
     {
-        spawnedTarget.transform.position = GetRandomOuter();
-        spawnCount++;
-        waitTime = 0;
+        targetSpawned.transform.position = GetRandomOuter();
     }
 
     private float GetOuterPercent(float percent)
     {
         return minDistance + ((maxDistance - minDistance) * percent);
+    }
+
+    public void Play()
+    {
+        initialPosition = transform.position;
+        targetComponent.OnHit += OnHit;
+        InitializeRanges();
+        ResetStats();
+        targetSpawned.SetActive(true);
+        targetSpawned.transform.position = GetRandomCenter();
+        IsPlaying = true;
+    }
+
+    private void ResetStats()
+    {
+        spawnedCount = 1;
+        totalTime = 0;
+        waitTime = 0;
+        avgKillTime = 0;
+    }
+
+    private void InitializeRanges()
+    {
+        var tempRanges = new WeightedRange[]{
+            new WeightedRange(GetOuterPercent(0.7f) , GetOuterPercent(1f), 80),
+            new WeightedRange(GetOuterPercent(0.3f) , GetOuterPercent(0.5f), 15),
+            new WeightedRange(GetOuterPercent(0f) , GetOuterPercent(0.1f), 5)
+        };
+        outerRanges = new WeightedSelection(tempRanges);
+    }
+
+    public void Stop()
+    {
+        targetSpawned.SetActive(false);
+        IsPlaying = false;
+        targetComponent.OnHit -= OnHit;
     }
 }

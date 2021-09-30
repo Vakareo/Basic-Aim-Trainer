@@ -3,26 +3,28 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TrackingTask : MonoBehaviour
+public class TrackingTask : MonoBehaviour, IGameMode
 {
     [SerializeField] GameObject targetPrefab;
-
+    [Range(0, 10f)]
     public float maxDepth = 5f;
+    [Range(0, 20f)]
     public float maxHorizontal = 10f;
+    [Range(0, 10f)]
     public float minSpeed = 1f;
+    [Range(0, 10f)]
     public float maxSpeed = 2f;
+    [Range(0, 10f)]
     public float maxHeight = 4f;
+    [Range(0, 10f)]
     public float maxOffset = 5f;
+    [Range(0, 5f)]
     public float switchRadius = 1f;
     private Transform targetTransform;
     private GameObject targetObject;
     private WeightedSelection horizontalRanges;
     private WeightedSelection depthRanges;
-    private int totalCount;
     private Vector3 travelTo;
-    private float randomRadius;
-    private float startDistance;
-    private float endDistance;
     private float currentDepth;
     private float currentHeight;
     private float halfDistance;
@@ -30,6 +32,10 @@ public class TrackingTask : MonoBehaviour
     private int switchCount;
     private float currentSpeed;
     private float currentOffset;
+    private void OnValidate()
+    {
+        minSpeed = Mathf.Min(maxSpeed, minSpeed);
+    }
 
     private void Awake()
     {
@@ -112,5 +118,15 @@ public class TrackingTask : MonoBehaviour
     private float GetHorizontal(float percent)
     {
         return maxHorizontal * percent;
+    }
+
+    public void Play()
+    {
+
+    }
+
+    public void Stop()
+    {
+
     }
 }

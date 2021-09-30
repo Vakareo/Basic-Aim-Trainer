@@ -211,7 +211,7 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -462981019419857548, guid: 180af3900c3968b44a93c7a4f598367c, type: 3}
---- !u!1 &242260107
+--- !u!1 &1628989766
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -219,95 +219,115 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 242260109}
-  - component: {fileID: 242260110}
+  - component: {fileID: 1628989768}
+  - component: {fileID: 1628989767}
+  - component: {fileID: 1628989769}
   m_Layer: 0
-  m_Name: GameSequence
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!4 &242260109
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 242260107}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.7, z: 7}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &242260110
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 242260107}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6736143e362b98f4d8ba4978426bfe13, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  targetPrefab: {fileID: 8758992402285307483, guid: a8bd6c92cf81d9c43852ec6b6e3d58e2, type: 3}
-  maxDistance: 5
-  minDistance: 1.5
-  maxHeight: 4
-  maxDepth: 4
-  time: 2
---- !u!1 &521530523
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 521530525}
-  - component: {fileID: 521530524}
-  m_Layer: 0
-  m_Name: TrackingAim
+  m_Name: GameModeLoader
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &521530524
+--- !u!114 &1628989767
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 521530523}
+  m_GameObject: {fileID: 1628989766}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5a3248eb8f76d8549a1b00df16ae174e, type: 3}
+  m_Script: {fileID: 11500000, guid: 9c90c1d68a05cce4db8662cbfbbce225, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetPrefab: {fileID: 8758992402285307483, guid: a8bd6c92cf81d9c43852ec6b6e3d58e2, type: 3}
-  maxDepth: 5
-  maxHorizontal: 8
-  minSpeed: 3
-  maxSpeed: 5
-  maxHeight: 1
-  maxOffset: 5
-  switchRadius: 3
---- !u!4 &521530525
+  gameModes:
+  - {fileID: 1148437471925424537, guid: 78a06ca117d800c4e8cd1c240ef0972b, type: 3}
+--- !u!4 &1628989768
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 521530523}
+  m_GameObject: {fileID: 1628989766}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.2, z: 5}
+  m_LocalPosition: {x: 0, y: 1, z: 8}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1628989769
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1628989766}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b1b8669320738d46aa537f714fe8d24, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  inputOne:
+    m_Name: Input One
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: bbc46e6a-7295-4049-80a1-0d97658da009
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: d5875142-f65e-4671-ae31-9e48591919de
+      m_Path: <Keyboard>/q
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Input One
+      m_Flags: 0
+  inputTwo:
+    m_Name: Input Two
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: f41ce51f-382c-4cd3-918d-3fbde2653891
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: fb77b284-b853-4c5a-9389-6adb78e66ec7
+      m_Path: <Keyboard>/w
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Input Two
+      m_Flags: 0
+  eventOne:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1628989767}
+        m_TargetAssemblyTypeName: GameModeLoader, Assembly-CSharp
+        m_MethodName: PlayFirstGamemode
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  eventTwo:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1628989767}
+        m_TargetAssemblyTypeName: GameModeLoader, Assembly-CSharp
+        m_MethodName: StopGamemode
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
