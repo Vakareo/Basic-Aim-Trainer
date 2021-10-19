@@ -26,17 +26,12 @@ public class ReturnCenterAimTrainer : MonoBehaviour, IGameMode
     public static Action<int> OnUpdatedAvg;
     private int avgKillTime;
 
-    public bool IsPlaying { get; private set; }
+    public bool isPlaying;
 
     private void OnValidate()
     {
         initialPosition = transform.position;
         minDistance = Mathf.Min(minDistance, maxDistance);
-    }
-
-    private void Awake()
-    {
-        InitializeObject();
     }
     private void InitializeObject()
     {
@@ -46,7 +41,7 @@ public class ReturnCenterAimTrainer : MonoBehaviour, IGameMode
     }
     private void Update()
     {
-        if (IsPlaying)
+        if (isPlaying)
         {
             waitTime += Time.deltaTime;
             if (isHit)
@@ -146,7 +141,7 @@ public class ReturnCenterAimTrainer : MonoBehaviour, IGameMode
         ResetStats();
         targetSpawned.SetActive(true);
         targetSpawned.transform.position = GetRandomCenter();
-        IsPlaying = true;
+        isPlaying = true;
     }
 
     private void ResetStats()
@@ -170,7 +165,12 @@ public class ReturnCenterAimTrainer : MonoBehaviour, IGameMode
     public void Stop()
     {
         targetSpawned.SetActive(false);
-        IsPlaying = false;
+        isPlaying = false;
         targetComponent.OnHit -= OnHit;
+    }
+
+    public void Initialize()
+    {
+        InitializeObject();
     }
 }

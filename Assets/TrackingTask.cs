@@ -27,77 +27,83 @@ public class TrackingTask : MonoBehaviour, IGameMode
     private Vector3 travelTo;
     private float currentDepth;
     private float currentHeight;
-    private float halfDistance;
+    private float currentHalfDistance;
     private Vector3 initialPosition;
     private int switchCount;
     private float currentSpeed;
     private float currentOffset;
+    private int startSide;
+    private bool isPlaying;
+    public float respawnTime;
+    private float currentTime;
+
     private void OnValidate()
     {
         minSpeed = Mathf.Min(maxSpeed, minSpeed);
     }
 
-    private void Awake()
-    {
-        totalCount = 1;
-        initialPosition = transform.position;
-        var tempRanges = new WeightedRange[]{
-            new WeightedRange(GetHorizontal(0.5f) , GetHorizontal(1f), 85),
-            new WeightedRange(GetHorizontal(0.25f) , GetHorizontal(0.5f), 10),
-            new WeightedRange(GetHorizontal(0.15f) , GetHorizontal(0.25f), 5)
-        };
-        horizontalRanges = new WeightedSelection(tempRanges);
-
-        tempRanges = new WeightedRange[]{
-            new WeightedRange(GetDepth(0.5f) , GetDepth(1f), 85),
-            new WeightedRange(GetDepth(0.25f) , GetDepth(0.5f), 10),
-            new WeightedRange(GetDepth(0.15f) , GetDepth(0.25f), 5)
-        };
-        depthRanges = new WeightedSelection(tempRanges);
-        InitializeObject();
-    }
 
     private void InitializeObject()
     {
+        targetObject = Instantiate(targetPrefab, transform.position, Quaternion.identity, transform);
+        targetTransform = targetObject.transform;
+        targetObject.SetActive(false);
+    }
+
+    private void SetNewCurrents()
+    {
         var depth = depthRanges.GetRange();
         var horizontal = horizontalRanges.GetRange();
-        halfDistance = UnityEngine.Random.Range(horizontal.startRange, horizontal.endRange) * 0.5f;
+        currentHalfDistance = UnityEngine.Random.Range(horizontal.startRange, horizontal.endRange) * 0.5f;
         currentDepth = UnityEngine.Random.Range(depth.startRange, depth.endRange) + initialPosition.z;
         currentHeight = UnityEngine.Random.Range(0, maxHeight) + initialPosition.y;
         currentSpeed = UnityEngine.Random.Range(minSpeed, maxSpeed);
         currentOffset = GetRandomOffset();
-        targetObject = Instantiate(targetPrefab, StartPos(), Quaternion.identity, transform);
-        targetTransform = targetObject.transform;
+        startSide = UnityEngine.Random.Range(0, 2);
     }
 
-    private Vector3 StartPos()
+    private void RespawnObjectToNextPosition()
     {
         switchCount = 0;
+        var value = GetNewTravel();
         SetNewTravel();
-        var value = travelTo;
-        SetNewTravel();
-        return value;
+        targetTransform.position = value;
     }
 
     private void Update()
     {
-        var direction = (travelTo - targetTransform.position).normalized;
-        var move = direction * currentSpeed * Time.deltaTime;
-        targetTransform.position += move;
-        var newDirection = (travelTo - targetTransform.position).normalized;
-        if (newDirection != direction)
+        if (isPlaying)
         {
-            SetNewTravel();
+            currentTime += Time.deltaTime;
+            if (currentTime >= respawnTime)
+            {
+                SetNewCurrents();
+                RespawnObjectToNextPosition();
+                currentTime = 0;
+            }
+            var direction = (travelTo - targetTransform.position).normalized;
+            var move = direction * currentSpeed * Time.deltaTime;
+            targetTransform.position += move;
+            var newDirection = (travelTo - targetTransform.position).normalized;
+            // Vector3.Dot(direction, newDirection) < 0
+            if (newDirection != direction)
+            {
+                SetNewTravel();
+            }
         }
+    }
+    private Vector3 GetNewTravel()
+    {
+        var odd = (switchCount + startSide) & 1;
+        var randDistance = currentHalfDistance + GetRandomRadius();
+        var tempDistance = (randDistance * odd) + ((-randDistance) * (odd - 1) * -1);
+        return new Vector3(tempDistance + initialPosition.x + currentOffset, currentHeight, currentDepth);
     }
 
     private void SetNewTravel()
     {
-        var odd = switchCount & 1;
-        var randDistance = halfDistance + GetRandomRadius();
-        var tempDistance = ((randDistance) * odd) + ((-randDistance) * (odd - 1) * -1);
         switchCount++;
-        travelTo = new Vector3(tempDistance + initialPosition.x + currentOffset, currentHeight, currentDepth);
+        travelTo = GetNewTravel();
     }
 
     private float GetRandomRadius()
@@ -120,13 +126,41 @@ public class TrackingTask : MonoBehaviour, IGameMode
         return maxHorizontal * percent;
     }
 
+    private void OnDestroy()
+    {
+        Stop();
+    }
+
     public void Play()
     {
-
+        initialPosition = transform.position;
+        SetNewCurrents();
+        RespawnObjectToNextPosition();
+        targetObject.SetActive(true);
+        isPlaying = true;
     }
 
     public void Stop()
     {
+        isPlaying = false;
+        targetObject.SetActive(false);
+    }
 
+    public void Initialize()
+    {
+        var tempRanges = new WeightedRange[]{
+            new WeightedRange(GetHorizontal(0.5f) , GetHorizontal(1f), 85),
+            new WeightedRange(GetHorizontal(0.25f) , GetHorizontal(0.5f), 10),
+            new WeightedRange(GetHorizontal(0.15f) , GetHorizontal(0.25f), 5)
+        };
+        horizontalRanges = new WeightedSelection(tempRanges);
+
+        tempRanges = new WeightedRange[]{
+            new WeightedRange(GetDepth(0.5f) , GetDepth(1f), 85),
+            new WeightedRange(GetDepth(0.25f) , GetDepth(0.5f), 10),
+            new WeightedRange(GetDepth(0.15f) , GetDepth(0.25f), 5)
+        };
+        depthRanges = new WeightedSelection(tempRanges);
+        InitializeObject();
     }
 }

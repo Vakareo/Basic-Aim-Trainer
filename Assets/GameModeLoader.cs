@@ -9,38 +9,53 @@ public class GameModeLoader : MonoBehaviour
     private GameObject loadedObject;
     private IGameMode loadedComponent;
 
-    public void PlayFirstGamemode()
+    public void Cycle()
     {
-        PlayGamemode(0);
+        var newIndex = (loadedIndex + 1) % gameModes.Length;
+        UnloadGamemode();
+        LoadGamemode(newIndex);
     }
+    private void Awake()
+    {
+        LoadGamemode(0);
+    }
+
+    private void UnloadGamemode()
+    {
+        if (loadedIndex != -1)
+        {
+            StopGamemode();
+            loadedComponent = null;
+            Destroy(loadedObject);
+            loadedObject = null;
+        }
+    }
+
     public void StopGamemode()
     {
         loadedComponent.Stop();
     }
 
-    public void PlayGamemode(int gamemode)
+    public void PlayGamemode()
     {
-        if (loadedIndex == gamemode)
-        {
-            ResetAndPlayGamemode();
-        }
-        else
-        {
-            LoadGamemode(gamemode);
-            ResetAndPlayGamemode();
-        }
+        ResetAndPlayGamemode();
     }
-    private void LoadGamemode(int gamemode)
+    public bool LoadGamemode(int gamemode)
     {
+        if (gamemode < 0 || gamemode >= gameModes.Length)
+            return false;
+
         loadedIndex = gamemode;
         loadedObject = Instantiate(gameModes[gamemode], transform.position, Quaternion.identity, transform);
-        loadedComponent = loadedObject.GetComponent<IGameMode>();
+        if (!loadedObject.TryGetComponent<IGameMode>(out loadedComponent))
+            return false;
+
+        loadedComponent.Initialize();
+        return true;
     }
     private void ResetAndPlayGamemode()
     {
         loadedComponent.Stop();
         loadedComponent.Play();
     }
-
-
 }
